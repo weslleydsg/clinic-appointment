@@ -28,25 +28,13 @@ class Clinic:
         self.doctors.append(doctor)
 
     def get_appointments_by_date(self, date):
-        appointments = []
-        for appointment in self.appointments:
-            if appointment.date == date:
-                appointments.append(appointment)
-        return appointments
+        return [appointment for appointment in self.appointments if appointment.date == date]
 
     def get_appointments_by_doctor(self, doctor):
-        appointments = []
-        for appointment in self.appointments:
-            if appointment.doctor.document == doctor.document:
-                appointments.append(appointment)
-        return appointments
+        return [appointment for appointment in self.appointments if appointment.doctor.document == doctor.document]
 
     def get_appointments_by_patient(self, patient):
-        appointments = []
-        for appointment in self.appointments:
-            if appointment.patient.document == patient.document:
-                appointments.append(appointment)
-        return appointments
+        return [appointment for appointment in self.appointments if appointment.patient.document == patient.document]
 
     def add_appointment(self, doctor, patient, date):
         appointment = Appointment(doctor, patient, date)
@@ -63,11 +51,7 @@ class Clinic:
         return count < doctor.max_availability_per_day
 
     def get_doctor_appointments_by_date(self, doctor, date):
-        appointments = []
-        for appointment in self.appointments:
-            if appointment.doctor.document == doctor.document and appointment.date == date:
-                appointments.append(appointment)
-        return appointments
+        return [appointment for appointment in self.appointments if appointment.doctor.document == doctor.document and appointment.date == date]
 
     def get_doctor_next_dates_available(self, doctor):
         dates = []
@@ -89,8 +73,6 @@ class Clinic:
         return doctors
 
     def get_specialties_offered(self):
-        specialties = []
-        for doctor in self.doctors:
-            specialties_names = doctor.get_specialties_names()
-            specialties = list(set(specialties + specialties_names))
-        return specialties
+        specialties = set(
+            specialty for doctor in self.doctors for specialty in doctor.get_specialties_names())
+        return list(specialties)
