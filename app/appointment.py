@@ -1,7 +1,5 @@
 class Appointment:
-    def __init__(self, patient, date):
+    def __init__(self, doctor, patient, date):
+        self.doctor = doctor
         self.patient = patient
         self.date = date
-
-    def __str__(self):
-        return f"patient: {self.patient.name}; date: {self.date}"

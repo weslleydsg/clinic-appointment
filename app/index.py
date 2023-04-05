@@ -7,8 +7,8 @@ from ui_client import UiClient
 cardiology = Specialty("Cardiology")
 dermatology = Specialty("Dermatology")
 
-doctors = [Doctor("Dr. Expert", [dermatology], 2), Doctor("Dr. Cardio", [cardiology, dermatology], 10),
-           Doctor("Dr. Derma", [dermatology], 8)]
+doctors = [Doctor("1", "Dr. Expert", [dermatology], 2), Doctor("2", "Dr. Cardio", [cardiology, dermatology], 10),
+           Doctor("3", "Dr. Derma", [dermatology], 8)]
 
 patients = [Patient("123", "Some One"), Patient("701", "Weslley Gomes")]
 
