@@ -14,7 +14,8 @@ class UiClient:
         try:
             return int(plain_selected_option)
         except ValueError:
-            print("You should provide a non negative integer")
+            print(
+                self.get_error_template("\nYou should provide a non negative integer"))
         return None
 
     def get_input_template(self, message):
@@ -26,14 +27,16 @@ class UiClient:
     def check_past_date(self, date):
         return date < datetime.date.today()
 
-    def prompt_date(self):
-        date_str = input(self.get_input_template(
-            "When do you want to make an appointment? (YYYY-MM-DD)"))
+    def prompt_date(self, message):
+        input_message = self.get_input_template(
+            f"{message} (YYYY-MM-DD)")
+        date_str = input(input_message)
         try:
             date = datetime.datetime.strptime(date_str, '%Y-%m-%d').date()
             return date
         except ValueError:
-            print("Invalid date format. Please enter the date in the format YYYY-MM-DD.")
+            print(
+                self.get_error_template("\nInvalid date format. Please enter the date in the format YYYY-MM-DD."))
         return None
 
     def start_clinic_services(self, clinic_index):
@@ -59,13 +62,29 @@ class UiClient:
                 case 3:
                     print(
                         f"\n# Selected Option: {service} #\n")
+                    self.prompt_reports(clinic_index)
                 case _:
                     print(
                         self.get_error_template(f"\"{selected_option}\" is not a valid service option"))
         except IndexError:
-            print("\nSelected option is not valid")
+            print(
+                self.get_error_template("\nSelected option is not valid"))
+        except TypeError:
+            print(
+                self.get_error_template("\nYou should provide a non negative integer"))
         print("")
         self.start_clinic_services(clinic_index)
+
+    def show_doctor_sign_in(self, clinic_index):
+        document = input(
+            self.get_input_template("\nWhat are your document number?"))
+        doctor = self.clinics[clinic_index].get_doctor_by_document(document)
+        if doctor is None:
+            print(self.get_error_template(
+                f"There is no doctor registered in this clinic for this document: \"{document}\""))
+            return None
+        print(f"\n# Welcome, {doctor.name} #\n")
+        return doctor
 
     def show_patient_sign_in(self, clinic_index):
         document = input(
@@ -73,7 +92,7 @@ class UiClient:
         patient = self.clinics[clinic_index].get_patient_by_document(document)
         if patient is None:
             print(self.get_error_template(
-                f"There is no patient registered in this client for this document: \"{document}\""))
+                f"There is no patient registered in this clinic for this document: \"{document}\""))
             return None
         print(f"\n# Welcome, {patient.name} #\n")
         return patient
@@ -89,27 +108,33 @@ class UiClient:
         try:
             specialty_name = specialties[selected_specialty]
             print(f"\n# Selected Specialty: \"{specialty_name}\" #\n")
-            date = self.prompt_date()
+            date = self.prompt_date("When do you want to make an appointment?")
             if date is None:
                 return
             is_past_date = self.check_past_date(date)
             if is_past_date:
-                print("You must provide a non past date")
+                print(
+                    self.get_error_template("You must provide a non past date"))
                 return
             print("")
             doctors = clinic.get_available_doctors_by_specialty_and_date(
                 specialty_name, date)
             if len(doctors) == 0:
-                print("No doctors available")
+                print(
+                    self.get_error_template("No doctors available"))
                 return
             selected_doctor = self.prompt_default_list_option(
                 doctors, self.get_input_template("Which doctor would you rather?"))
             doctor = doctors[selected_doctor]
             clinic.add_appointment(doctor, patient, date)
             print("\n~ You have booked your appointment to",
-                  date, "sucefully with", doctor.name, "~")
+                  date, "successfully with", doctor.name, "~")
         except IndexError:
-            print("\nSelected option is not valid")
+            print(
+                self.get_error_template("\nSelected option is not valid"))
+        except TypeError:
+            print(
+                self.get_error_template("\nYou should provide a non negative integer"))
 
     def show_doctor_availability(self, clinic_index):
         try:
@@ -122,7 +147,11 @@ class UiClient:
             for date in dates:
                 print(f"    {date}")
         except IndexError:
-            print("\nSelected option is not valid")
+            print(
+                self.get_error_template("\nSelected option is not valid"))
+        except TypeError:
+            print(
+                self.get_error_template("\nYou should provide a non negative integer"))
 
     def cancel_appointment(self, clinic_index):
         try:
@@ -132,10 +161,60 @@ class UiClient:
             clinic = self.clinics[clinic_index]
             appointments = clinic.get_appointments_by_patient(patient)
             if len(appointments) == 0:
-                print("You have no appointments")
+                print(
+                    self.get_error_template("You have no appointments"))
                 return
             selected_appointment = self.prompt_default_list_option(
                 appointments, self.get_input_template("Which appointment do you want to cancel?"))
             clinic.cancel_appointment(appointments[selected_appointment])
         except IndexError:
-            print("\nSelected option is not valid")
+            print(
+                self.get_error_template("\nSelected option is not valid"))
+
+    def show_appointments(self, appointments):
+        for appointment in appointments:
+            print(
+                f"    Appointment on {appointment.date} for patient {appointment.patient.name} with {appointment.doctor.name}")
+
+    def handle_show_appointments(self, appointments):
+        if len(appointments) == 0:
+            print(
+                self.get_error_template("The is no appointments available"))
+            return
+        self.show_appointments(appointments)
+
+    def show_clinic_appointments_by_date(self, clinic, date):
+        appointments = clinic.get_appointments_by_date(date)
+        if len(appointments) == 0:
+            print(
+                self.get_error_template("The is no appointments available"))
+            return
+        print("\n# Appointments for date:", date, ":\n")
+        self.show_appointments(appointments)
+
+    def prompt_reports(self, clinic_index):
+        reports_option = ["Patient appointments", "Doctor appointments",
+                          "Clinic appointments for today", "Clinic appointments by date"]
+        selected_option = self.prompt_default_list_option(reports_option, self.get_input_template(
+            "Which service are you looking for?"))
+        clinic = self.clinics[clinic_index]
+        match selected_option:
+            case 0:
+                print("")
+                patient = self.show_patient_sign_in(clinic_index)
+                appointments = clinic.get_appointments_by_patient(patient)
+                self.handle_show_appointments(appointments)
+            case 1:
+                doctor = self.show_doctor_sign_in(clinic_index)
+                appointments = clinic.get_appointments_by_doctor(doctor)
+                self.handle_show_appointments(appointments)
+            case 2:
+                date = datetime.date.today()
+                self.show_clinic_appointments_by_date(clinic, date)
+            case 3:
+                date = self.prompt_date(
+                    "When do you want to see the appointments?")
+                self.show_clinic_appointments_by_date(clinic, date)
+            case _:
+                print(
+                    self.get_error_template(f"\"{selected_option}\" is not a valid report option"))
