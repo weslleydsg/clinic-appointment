@@ -12,6 +12,12 @@ class Clinic:
         self.patients = patients
         self.appointments = []
 
+    def get_doctor_by_document(self, document):
+        for doctor in self.doctors:
+            if doctor.document == document:
+                return doctor
+        return None
+
     def get_patient_by_document(self, document):
         for patient in self.patients:
             if patient.document == document:
@@ -20,6 +26,20 @@ class Clinic:
 
     def add_doctor(self, doctor):
         self.doctors.append(doctor)
+
+    def get_appointments_by_date(self, date):
+        appointments = []
+        for appointment in self.appointments:
+            if appointment.date == date:
+                appointments.append(appointment)
+        return appointments
+
+    def get_appointments_by_doctor(self, doctor):
+        appointments = []
+        for appointment in self.appointments:
+            if appointment.doctor.document == doctor.document:
+                appointments.append(appointment)
+        return appointments
 
     def get_appointments_by_patient(self, patient):
         appointments = []
@@ -74,15 +94,3 @@ class Clinic:
             specialties_names = doctor.get_specialties_names()
             specialties = list(set(specialties + specialties_names))
         return specialties
-
-    # def cancel_appointment(self, patient):
-    #     for appointment in self.appointments:
-    #         if appointment.doctor == patient.doctor and appointment.appointment_date == patient.appointment_date:
-    #             self.appointments.remove(appointment)
-    #             patient.doctor.daily_availability += 1
-    #             print(
-    #                 f"{patient.name} has cancelled their appointment with {patient.doctor.name} on {patient.appointment_date}.")
-    #             break
-    #     else:
-    #         print(
-    #             f"{patient.name} does not have an appointment with {patient.doctor.name} on {patient.appointment_date}.")
