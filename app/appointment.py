@@ -3,3 +3,6 @@ class Appointment:
         self.doctor = doctor
         self.patient = patient
         self.date = date
+
+    def __str__(self):
+        return f"Appointment on {self.date} with {self.doctor.name}"
