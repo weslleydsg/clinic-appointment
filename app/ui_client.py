@@ -4,7 +4,7 @@ import datetime
 class UiClient:
     def __init__(self, clinics):
         self.home_services = ["Doctors Availability",
-                              "Book Appointment", "Delete an Appointment", "Reports"]
+                              "Book Appointment", "Cancel an Appointment", "Reports"]
         self.clinics = clinics
 
     def prompt_default_list_option(self, option_list, input_message):
@@ -101,7 +101,7 @@ class UiClient:
             selected_doctor = self.prompt_default_list_option(
                 doctors, self.get_input_template("Which doctor would you rather?"))
             doctor = doctors[selected_doctor]
-            doctor.add_appointment(patient, date)
+            clinic.add_appointment(doctor, patient, date)
             print("\n~ You have booked your appointment to",
                   date, "sucefully with", doctor.name, "~")
         except IndexError:
@@ -112,7 +112,7 @@ class UiClient:
         selected_doctor = self.prompt_default_list_option(
             clinic.doctors, self.get_input_template("Which doctor would you rather?"))
         doctor = clinic.doctors[selected_doctor]
-        dates = doctor.get_next_dates_available()
-        print(f"# {doctor.name} next dates available is: #")
+        dates = clinic.get_doctor_next_dates_available(doctor)
+        print(f"\n# {doctor.name} next dates available is: #")
         for date in dates:
             print(f"    {date}")
