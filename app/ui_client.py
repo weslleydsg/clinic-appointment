@@ -77,7 +77,7 @@ class UiClient:
 
     def show_doctor_sign_in(self, clinic_index):
         document = input(
-            self.get_input_template("\nWhat are your document number?"))
+            self.get_input_template("What are your document number?"))
         doctor = self.clinics[clinic_index].get_doctor_by_document(document)
         if doctor is None:
             print(self.get_error_template(
@@ -205,6 +205,7 @@ class UiClient:
                 appointments = clinic.get_appointments_by_patient(patient)
                 self.handle_show_appointments(appointments)
             case 1:
+                print("")
                 doctor = self.show_doctor_sign_in(clinic_index)
                 appointments = clinic.get_appointments_by_doctor(doctor)
                 self.handle_show_appointments(appointments)
