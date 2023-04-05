@@ -46,6 +46,7 @@ class UiClient:
             case 0:
                 print(
                     f"\n# Selected Option: {service} #\n")
+                self.show_doctor_availability(clinic_index)
             case 1:
                 print(
                     f"\n# Selected Option: {service} #\n")
@@ -105,3 +106,13 @@ class UiClient:
                   date, "sucefully with", doctor.name, "~")
         except IndexError:
             print("\nSelected option is not valid")
+
+    def show_doctor_availability(self, clinic_index):
+        clinic = self.clinics[clinic_index]
+        selected_doctor = self.prompt_default_list_option(
+            clinic.doctors, self.get_input_template("Which doctor would you rather?"))
+        doctor = clinic.doctors[selected_doctor]
+        dates = doctor.get_next_dates_available()
+        print(f"# {doctor.name} next dates available is: #")
+        for date in dates:
+            print(f"    {date}")

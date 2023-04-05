@@ -1,4 +1,7 @@
+import datetime
 from appointment import Appointment
+
+MAX_DAYS = 10
 
 
 class Doctor:
@@ -24,3 +27,20 @@ class Doctor:
             if appointment.date == date:
                 count += 1
         return count < self.max_availability_per_day
+
+    def get_appointments_by_date(self, date):
+        appointments = []
+        for appointment in self.appointments:
+            if appointment.date == date:
+                appointments.append(appointment)
+        return appointments
+
+    def get_next_dates_available(self):
+        dates = []
+        date = datetime.date.today()
+        while len(dates) < MAX_DAYS:
+            appointments = self.get_appointments_by_date(date)
+            if len(appointments) < self.max_availability_per_day:
+                dates.append(date.strftime('%Y-%m-%d'))
+            date = date + datetime.timedelta(days=1)
+        return dates
