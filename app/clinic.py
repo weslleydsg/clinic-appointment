@@ -21,9 +21,19 @@ class Clinic:
     def add_doctor(self, doctor):
         self.doctors.append(doctor)
 
+    def get_appointments_by_patient(self, patient):
+        appointments = []
+        for appointment in self.appointments:
+            if appointment.patient.document == patient.document:
+                appointments.append(appointment)
+        return appointments
+
     def add_appointment(self, doctor, patient, date):
         appointment = Appointment(doctor, patient, date)
         self.appointments.append(appointment)
+
+    def cancel_appointment(self, appointment):
+        self.appointments.remove(appointment)
 
     def check_doctor_availability_by_date(self, doctor, date):
         count = 0

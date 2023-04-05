@@ -41,25 +41,29 @@ class UiClient:
         print(f"# Welcome to {clinic.name} #\n")
         selected_option = self.prompt_default_list_option(self.home_services, self.get_input_template(
             "Which service are you looking for?"))
-        service = self.home_services[selected_option]
-        match selected_option:
-            case 0:
-                print(
-                    f"\n# Selected Option: {service} #\n")
-                self.show_doctor_availability(clinic_index)
-            case 1:
-                print(
-                    f"\n# Selected Option: {service} #\n")
-                self.book_appointment(clinic_index)
-            case 2:
-                print(
-                    f"\n# Selected Option: {service} #\n")
-            case 3:
-                print(
-                    f"\n# Selected Option: {service} #\n")
-            case _:
-                print(
-                    self.get_error_template(f"\"{selected_option}\" is not a valid service option"))
+        try:
+            service = self.home_services[selected_option]
+            match selected_option:
+                case 0:
+                    print(
+                        f"\n# Selected Option: {service} #\n")
+                    self.show_doctor_availability(clinic_index)
+                case 1:
+                    print(
+                        f"\n# Selected Option: {service} #\n")
+                    self.book_appointment(clinic_index)
+                case 2:
+                    print(
+                        f"\n# Selected Option: {service} #\n")
+                    self.cancel_appointment(clinic_index)
+                case 3:
+                    print(
+                        f"\n# Selected Option: {service} #\n")
+                case _:
+                    print(
+                        self.get_error_template(f"\"{selected_option}\" is not a valid service option"))
+        except IndexError:
+            print("\nSelected option is not valid")
         print("")
         self.start_clinic_services(clinic_index)
 
@@ -108,11 +112,30 @@ class UiClient:
             print("\nSelected option is not valid")
 
     def show_doctor_availability(self, clinic_index):
-        clinic = self.clinics[clinic_index]
-        selected_doctor = self.prompt_default_list_option(
-            clinic.doctors, self.get_input_template("Which doctor would you rather?"))
-        doctor = clinic.doctors[selected_doctor]
-        dates = clinic.get_doctor_next_dates_available(doctor)
-        print(f"\n# {doctor.name} next dates available is: #")
-        for date in dates:
-            print(f"    {date}")
+        try:
+            clinic = self.clinics[clinic_index]
+            selected_doctor = self.prompt_default_list_option(
+                clinic.doctors, self.get_input_template("Which doctor would you rather?"))
+            doctor = clinic.doctors[selected_doctor]
+            dates = clinic.get_doctor_next_dates_available(doctor)
+            print(f"\n# {doctor.name} next dates available is: #")
+            for date in dates:
+                print(f"    {date}")
+        except IndexError:
+            print("\nSelected option is not valid")
+
+    def cancel_appointment(self, clinic_index):
+        try:
+            patient = self.show_patient_sign_in(clinic_index)
+            if patient is None:
+                return
+            clinic = self.clinics[clinic_index]
+            appointments = clinic.get_appointments_by_patient(patient)
+            if len(appointments) == 0:
+                print("You have no appointments")
+                return
+            selected_appointment = self.prompt_default_list_option(
+                appointments, self.get_input_template("Which appointment do you want to cancel?"))
+            clinic.cancel_appointment(appointments[selected_appointment])
+        except IndexError:
+            print("\nSelected option is not valid")
